@@ -42,11 +42,12 @@ Após o deploy, você precisa configurar algumas variáveis:
 
 O Render vai:
 1. ✅ Criar Redis (banco de dados)
-2. ✅ Fazer build e deploy do Backend API
-3. ✅ Fazer build e deploy do Worker
-4. ✅ Fazer build e deploy do Frontend
+2. ✅ Fazer build e deploy do Backend API (inclui worker no mesmo processo)
+3. ✅ Fazer build e deploy do Frontend
 
 Isso pode levar 5-10 minutos na primeira vez.
+
+**Nota:** O Worker roda junto com o Backend API no mesmo processo para funcionar no plano gratuito!
 
 ### 5. Testar a Aplicação
 
@@ -56,8 +57,7 @@ Quando tudo estiver verde (✅), acesse a URL do frontend que o Render forneceu!
 
 Após o deploy, você terá:
 - **Frontend:** `https://video-transcription-frontend.onrender.com`
-- **Backend API:** `https://video-transcription-api.onrender.com`
-- **Worker:** Rodando em background (sem URL pública)
+- **Backend API + Worker:** `https://video-transcription-api.onrender.com`
 - **Redis:** Interno (conectado automaticamente)
 
 ## Troubleshooting
@@ -66,9 +66,10 @@ Após o deploy, você terá:
 - Verifique se a `OPENAI_API_KEY` está configurada
 - Verifique os logs no Render Dashboard
 
-### Worker não processa vídeos?
+### Vídeos não são processados?
 - Verifique se o Redis está rodando
-- Verifique os logs do Worker
+- Verifique nos logs se o Worker iniciou (deve aparecer "Worker started")
+- Verifique os logs do Backend para erros de processamento
 
 ### Frontend não conecta ao Backend?
 - Verifique se `VITE_API_URL` está configurada corretamente

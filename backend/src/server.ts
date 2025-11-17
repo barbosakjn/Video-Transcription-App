@@ -2,6 +2,8 @@ import app from './app';
 import { config, validateConfig } from './config/env.config';
 import { logger } from './utils/logger';
 import { startCleanupScheduler } from './services/cleanup.service';
+import { transcriptionQueue } from './config/queue.config';
+import { processTranscription } from './queue/processors/transcription.processor';
 import fs from 'fs/promises';
 
 // Validate configuration
@@ -35,6 +37,14 @@ async function startServer() {
     // Start cleanup scheduler
     startCleanupScheduler();
 
+    // Start worker (process transcription jobs in same process)
+    transcriptionQueue.process(config.processing.workerConcurrency, async (job) => {
+      logger.info(`Worker processing job ${job.id}`);
+      await processTranscription(job);
+      return { success: true };
+    });
+    logger.info(`🔧 Worker started with concurrency: ${config.processing.workerConcurrency}`);
+
     // Start HTTP server
     const server = app.listen(config.port, () => {
       logger.info(`🚀 Server started successfully`);
@@ -54,6 +64,10 @@ async function startServer() {
     // Graceful shutdown
     const shutdown = async () => {
       logger.info('Shutting down server gracefully...');
+
+      // Close queue first
+      await transcriptionQueue.close();
+      logger.info('Queue closed');
 
       server.close(() => {
         logger.info('HTTP server closed');

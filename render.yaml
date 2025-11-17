@@ -6,7 +6,7 @@ services:
     maxmemoryPolicy: noeviction
     ipAllowList: []
 
-  # Backend API
+  # Backend API (includes worker in same process for free tier)
   - type: web
     name: video-transcription-api
     runtime: node
@@ -65,53 +65,6 @@ services:
         value: info
       - key: ENABLE_METRICS
         value: false
-
-  # Background Worker
-  - type: worker
-    name: video-transcription-worker
-    runtime: node
-    plan: free
-    buildCommand: cd backend && npm install && npm run build
-    startCommand: cd backend && npm run worker
-    envVars:
-      - key: NODE_ENV
-        value: production
-      - key: REDIS_HOST
-        fromService:
-          type: redis
-          name: video-transcription-redis
-          property: host
-      - key: REDIS_PORT
-        fromService:
-          type: redis
-          name: video-transcription-redis
-          property: port
-      - key: OPENAI_API_KEY
-        sync: false
-      - key: MAX_FILE_SIZE
-        value: 2147483648
-      - key: MAX_VIDEO_DURATION
-        value: 3000
-      - key: TEMP_UPLOAD_DIR
-        value: /tmp/uploads
-      - key: TEMP_AUDIO_DIR
-        value: /tmp/audio
-      - key: CLEANUP_INTERVAL
-        value: 3600000
-      - key: FILE_TTL
-        value: 3600
-      - key: RESULT_TTL
-        value: 86400
-      - key: WORKER_CONCURRENCY
-        value: 3
-      - key: PROCESSING_TIMEOUT
-        value: 7200000
-      - key: FFMPEG_PATH
-        value: ffmpeg
-      - key: FFPROBE_PATH
-        value: ffprobe
-      - key: LOG_LEVEL
-        value: info
 
   # Frontend
   - type: web
