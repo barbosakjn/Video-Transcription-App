@@ -11,7 +11,7 @@ services:
     name: video-transcription-api
     runtime: node
     plan: free
-    buildCommand: cd backend && npm install && npm run build
+    buildCommand: cd backend && npm install --production=false && npm run build
     startCommand: cd backend && npm start
     healthCheckPath: /api/health
     envVars:
@@ -70,7 +70,7 @@ services:
   - type: web
     name: video-transcription-frontend
     runtime: static
-    buildCommand: cd frontend && npm install && npm run build
+    buildCommand: cd frontend && npm install --production=false && npm run build
     staticPublishPath: frontend/dist
     envVars:
       - key: VITE_API_URL
